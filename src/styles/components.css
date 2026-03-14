@@ -1,0 +1,250 @@
+/* ── Buttons ──────────────────────────────────────── */
+.btn {
+  padding: 7px 16px;
+  border-radius: var(--r);
+  border: 1px solid var(--border2);
+  background: none;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.btn:hover  { background: var(--bg3); }
+.btn.pri    { background: var(--accent); color: var(--bg2); border-color: var(--accent); font-weight: 500; }
+.btn.pri:hover { opacity: 0.87; }
+.btn.ghost  { border-color: transparent; color: var(--text2); }
+.btn.ghost:hover { color: var(--text); background: var(--bg3); border-color: var(--border); }
+.btn.danger { color: #DC2626; border-color: rgba(220, 38, 38, 0.3); }
+.btn.danger:hover { background: rgba(220, 38, 38, 0.07); }
+.btn.soft   { background: var(--bg3); border-color: transparent; color: var(--text2); font-size: 12px; }
+.btn.soft:hover { background: var(--bg4); color: var(--text); }
+.btn:disabled { opacity: 0.38; cursor: default; }
+
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 11px;
+  border-radius: var(--r);
+  border: 1px dashed var(--border2);
+  background: none;
+  color: var(--text3);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+  margin-top: 6px;
+}
+.add-btn:hover { color: var(--text); border-color: var(--text2); background: var(--bg4); }
+
+/* ── Cards ────────────────────────────────────────── */
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--rl);
+  padding: 18px 22px;
+}
+
+/* ── Icon button ──────────────────────────────────── */
+.ib {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  transition: all 0.12s;
+}
+.ib:hover { background: var(--bg3); color: var(--text); }
+
+/* ── Labels ───────────────────────────────────────── */
+.st {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 500;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 100px;
+  background: var(--bg4);
+  color: var(--text2);
+  border: 1px solid var(--border);
+}
+
+/* ── Status pills ─────────────────────────────────── */
+.pill   { font-size: 10px; padding: 2px 8px; border-radius: 100px; font-weight: 500; flex-shrink: 0; letter-spacing: 0.03em; }
+.p-active    { background: rgba(22, 163, 74, 0.10); color: #16A34A; }
+.p-building  { background: rgba(202, 138, 4, 0.10); color: #CA8A04; }
+.p-planned   { background: rgba(100, 100, 100, 0.08); color: var(--text3); }
+.p-attention { background: rgba(220, 38, 38, 0.08); color: #DC2626; }
+
+/* ── Modal ────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--rl);
+  padding: 24px;
+  width: 100%;
+  max-width: 460px;
+  max-height: 86vh;
+  overflow-y: auto;
+}
+.modal-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 18px;
+}
+.btn-row {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+/* ── Form fields ──────────────────────────────────── */
+.field { margin-bottom: 14px; }
+.field label {
+  display: block;
+  font-size: 10px;
+  color: var(--text2);
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.field input,
+.field textarea,
+.field select {
+  width: 100%;
+  padding: 8px 11px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: border 0.12s;
+}
+.field input:focus,
+.field textarea:focus,
+.field select:focus { border-color: var(--text2); }
+.field textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+textarea {
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--r);
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  resize: vertical;
+  line-height: 1.55;
+  transition: border 0.12s;
+}
+textarea:focus { border-color: var(--text2); }
+
+/* ── Color swatches ───────────────────────────────── */
+.swatches { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 5px; }
+.swatch { width: 22px; height: 22px; border-radius: 50%; cursor: pointer; border: 2.5px solid transparent; transition: border 0.1s; }
+.swatch.on { border-color: var(--text); }
+
+/* ── KR bar ───────────────────────────────────────── */
+.kr-row  { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+.kr-wrap { width: 80px; height: 3px; background: var(--bg3); border-radius: 2px; flex-shrink: 0; }
+.kr-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
+
+/* ── Empty state ──────────────────────────────────── */
+.empty { text-align: center; padding: 38px 20px; color: var(--text3); font-size: 13px; }
+
+/* ── Undo row ─────────────────────────────────────── */
+.undo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg3);
+  border-radius: var(--r);
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--text2);
+}
+
+/* ── Note chip ────────────────────────────────────── */
+.note-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--bg3);
+  border-radius: var(--r);
+  margin-bottom: 6px;
+  font-size: 13px;
+}
+
+/* ── Inner tabs ───────────────────────────────────── */
+.inner-tabs { display: flex; gap: 4px; margin-bottom: 18px; }
+.inner-tab {
+  padding: 5px 14px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text2);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.inner-tab.on { border-color: var(--text); color: var(--text); background: var(--bg3); }
+
+/* ── Review banner ────────────────────────────────── */
+.rev-banner {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--rl);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.rev-dot { width: 9px; height: 9px; border-radius: 50%; background: #16A34A; flex-shrink: 0; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ── Footer ───────────────────────────────────────── */
+.footer {
+  text-align: center;
+  padding: 32px 24px 24px;
+  border-top: 1px solid var(--border);
+  margin-top: 40px;
+}
+.footer-text { font-size: 11px; color: var(--text3); letter-spacing: 0.04em; }
+.footer-link {
+  color: var(--text2);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--border2);
+  padding-bottom: 1px;
+  transition: color 0.12s;
+}
+.footer-link:hover { color: var(--text); }
