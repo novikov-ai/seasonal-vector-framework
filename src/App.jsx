@@ -36,7 +36,9 @@ export default function App() {
   }
 
   function toggleTheme() {
-    setThemeRaw(t => t === 'dark' ? 'light' : 'dark')
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const currentlyDark = theme === 'dark' || (theme === 'system' && prefersDark)
+    setThemeRaw(currentlyDark ? 'light' : 'dark')
   }
 
   function handleOnboard(choice) {
