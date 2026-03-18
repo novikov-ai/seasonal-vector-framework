@@ -82,10 +82,10 @@
 
 /* ── Status pills ─────────────────────────────────── */
 .pill   { font-size: 10px; padding: 2px 8px; border-radius: 100px; font-weight: 500; flex-shrink: 0; letter-spacing: 0.03em; }
-.p-active    { background: rgba(22, 163, 74, 0.10); color: #16A34A; }
-.p-building  { background: rgba(202, 138, 4, 0.10); color: #CA8A04; }
-.p-planned   { background: rgba(100, 100, 100, 0.08); color: var(--text3); }
-.p-attention { background: rgba(220, 38, 38, 0.08); color: #DC2626; }
+.p-on-track    { background: rgba(22, 163, 74, 0.10);  color: #16A34A; }
+.p-not-started { background: rgba(100, 100, 100, 0.08); color: var(--text3); }
+.p-attention   { background: rgba(220, 38, 38, 0.08);  color: #DC2626; }
+.p-paused      { background: rgba(202, 138, 4, 0.10);  color: #CA8A04; }
 
 /* ── Modal ────────────────────────────────────────── */
 .modal-overlay {

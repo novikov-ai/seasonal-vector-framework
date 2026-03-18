@@ -20,7 +20,6 @@ function VecRow({ vec, dom, onEditVec, onAddAction, onEditAction, onDelAction, o
 
   return (
     <div className="vec-row">
-      <div className="vec-letter">{vec.letter}</div>
       <div style={{ flex: 1 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
           <div style={{ fontSize: 13, fontWeight: 500, cursor: 'pointer' }} onClick={() => setOpen(o => !o)}>
@@ -279,7 +278,7 @@ export default function Map({ data, setData }) {
               ))}
               <button
                 className="add-btn"
-                onClick={() => setEditVec({ dId: dom.id, vec: { letter: '', name: '', goal: '', status: 'planned', actions: [], krs: [], isNew: true } })}
+                onClick={() => setEditVec({ dId: dom.id, vec: { name: '', goal: '', status: 'not started', actions: [], krs: [], isNew: true } })}
               >
                 + Vector
               </button>

@@ -112,7 +112,6 @@
 
 .vec-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .vec-row:last-child { border-bottom: none; }
-.vec-letter { font-size: 11px; color: var(--text3); width: 14px; flex-shrink: 0; padding-top: 2px; }
 .vec-expand { background: var(--bg3); border-radius: var(--r); padding: 12px 14px; margin-top: 7px; }
 .vec-expand-title { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
 

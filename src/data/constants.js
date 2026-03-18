@@ -18,7 +18,7 @@ export const MONTH_NAMES = [
 
 export const DAY_LABELS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
 
-export const STATUS_OPTIONS = ['active', 'building', 'planned', 'attention']
+export const STATUS_OPTIONS = ['on track', 'not started', 'attention', 'paused']
 
 export const ICEBREAKERS = [
   { id: 'ib1', q: 'What was the single most important thing that happened this week?' },

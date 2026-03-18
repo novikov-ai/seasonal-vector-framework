@@ -17,7 +17,7 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
 
   const activeVecs = domains.flatMap(d =>
     d.vectors
-      .filter(v => ['active', 'building', 'attention'].includes(v.status))
+      .filter(v => ['on track', 'attention'].includes(v.status))
       .map(v => ({ ...v, domainName: d.name, domainColor: d.color }))
   )
   const allKRs = []
@@ -400,7 +400,7 @@ export default function Review({ data, setData }) {
           <div className="card" style={{ padding: '4px 16px' }}>
             {data.domains.flatMap(d =>
               d.vectors
-                .filter(v => ['active', 'building', 'attention'].includes(v.status))
+                .filter(v => ['on track', 'attention'].includes(v.status))
                 .map(v => (
                   <div key={v.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 0', borderBottom: '1px solid var(--border)' }}>
                     <div style={{ width: 7, height: 7, borderRadius: '50%', background: d.color, flexShrink: 0 }} />

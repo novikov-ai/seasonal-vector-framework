@@ -4,7 +4,7 @@ export const EXAMPLE_DATA = {
       id: 'd1', name: 'Career', color: '#E8630A',
       vectors: [
         {
-          id: 'v1', letter: 'A', name: 'Path Resolution',
+          id: 'v1', name: 'Path Resolution',
           goal: 'Decide your career direction by end of Q1',
           status: 'attention',
           actions: [
@@ -15,9 +15,9 @@ export const EXAMPLE_DATA = {
           krs: [{ id: 'k1', label: 'Decision clarity score', current: 60, target: 100 }],
         },
         {
-          id: 'v2', letter: 'B', name: 'Public Brand',
+          id: 'v2', name: 'Public Brand',
           goal: 'Reach 500 channel subscribers through consistent publishing',
-          status: 'building',
+          status: 'on track',
           actions: [
             { id: 'a4', text: 'Publish 2 posts per week', quarter: 'Q1' },
             { id: 'a5', text: 'Write methodology intro series', quarter: 'Q1' },
@@ -30,9 +30,9 @@ export const EXAMPLE_DATA = {
       id: 'd2', name: 'Sport', color: '#16A34A',
       vectors: [
         {
-          id: 'v4', letter: 'A', name: 'Race Goal',
+          id: 'v4', name: 'Race Goal',
           goal: 'Complete a 30k race this autumn',
-          status: 'active',
+          status: 'on track',
           actions: [
             { id: 'a7', text: 'Build base mileage to 35km/week', quarter: 'Q1' },
             { id: 'a8', text: 'Weekly long run every Sunday', quarter: 'Q1' },
@@ -43,9 +43,9 @@ export const EXAMPLE_DATA = {
           ],
         },
         {
-          id: 'v5', letter: 'B', name: 'Chess Rating',
+          id: 'v5', name: 'Chess Rating',
           goal: 'Reach 1700 blitz rating',
-          status: 'building',
+          status: 'on track',
           actions: [{ id: 'a9', text: '30 min tactics daily', quarter: 'Q1' }],
           krs: [{ id: 'k6', label: 'Blitz rating', current: 1540, target: 1700 }],
         },
@@ -55,9 +55,9 @@ export const EXAMPLE_DATA = {
       id: 'd3', name: 'Finances', color: '#0891B2',
       vectors: [
         {
-          id: 'v6', letter: 'A', name: 'Income Growth',
+          id: 'v6', name: 'Income Growth',
           goal: 'Grow total income 15%+ through new revenue streams',
-          status: 'building',
+          status: 'on track',
           actions: [{ id: 'a10', text: 'Price and launch first paid offering', quarter: 'Q1' }],
           krs: [{ id: 'k7', label: 'Income vs baseline %', current: 105, target: 115 }],
         },
@@ -67,9 +67,9 @@ export const EXAMPLE_DATA = {
       id: 'd4', name: 'Health', color: '#7C3AED',
       vectors: [
         {
-          id: 'v7', letter: 'A', name: 'Sleep Quality',
+          id: 'v7', name: 'Sleep Quality',
           goal: 'Consistent 7.5h+ nightly sleep',
-          status: 'active',
+          status: 'on track',
           actions: [{ id: 'a12', text: 'Hard cutoff: screens off 10:45pm', quarter: 'Q1' }],
           krs: [{ id: 'k8', label: 'Avg sleep hours', current: 6.8, target: 7.5 }],
         },
@@ -79,9 +79,9 @@ export const EXAMPLE_DATA = {
       id: 'd5', name: 'Discipline', color: '#CA8A04',
       vectors: [
         {
-          id: 'v8', letter: 'A', name: 'Morning Routine',
+          id: 'v8', name: 'Morning Routine',
           goal: 'Consistent wake time + structured morning workflow',
-          status: 'active',
+          status: 'on track',
           actions: [
             { id: 'a14', text: '6:30am wake, no snooze', quarter: 'Q1' },
             { id: 'a15', text: '15min planning session before work', quarter: 'Q1' },

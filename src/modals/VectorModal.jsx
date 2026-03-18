@@ -4,10 +4,9 @@ import { STATUS_OPTIONS } from '../data/constants'
 
 export default function VectorModal({ vec, onSave, onDelete, onClose }) {
   const [f, setF] = useState({
-    letter: vec.letter || '',
     name:   vec.name   || '',
     goal:   vec.goal   || '',
-    status: vec.status || 'planned',
+    status: vec.status || 'not started',
   })
   const up = k => e => setF(x => ({ ...x, [k]: e.target.value }))
 
@@ -19,14 +18,9 @@ export default function VectorModal({ vec, onSave, onDelete, onClose }) {
       onSave={() => onSave({ ...vec, ...f })}
       saveDisabled={!f.name.trim()}
     >
-      <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr', gap: 10 }}>
-        <Field label="Letter">
-          <input value={f.letter} onChange={up('letter')} maxLength={2} placeholder="A" autoFocus />
-        </Field>
-        <Field label="Name">
-          <input value={f.name} onChange={up('name')} placeholder="e.g. Race Training, Career Path..." />
-        </Field>
-      </div>
+      <Field label="Name">
+        <input value={f.name} onChange={up('name')} placeholder="e.g. Race Training, Career Path..." autoFocus />
+      </Field>
       <Field label="Year goal">
         <textarea
           value={f.goal}
