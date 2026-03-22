@@ -1,10 +1,33 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import confetti from 'canvas-confetti'
 import { marked } from 'marked'
 import { isSunday, formatWeekRange, getWeekKey, todayString } from '../data/utils'
 import { ICEBREAKERS, FREE_PROMPTS, RATING_LABELS, RATING_COLORS, RATING_EMOJIS } from '../data/constants'
 import { loadReviews, saveReviews } from '../data/storage'
 import { uid } from '../data/utils'
+
+// ── Numeric input that allows free typing with dot ────────────────────────
+function NumericInput({ value, onChange }) {
+  const [str, setStr] = useState(String(value))
+  useEffect(() => { setStr(String(value)) }, [value])
+  return (
+    <input
+      type="text"
+      inputMode="decimal"
+      value={str}
+      onChange={e => {
+        const raw = e.target.value
+        setStr(raw)
+        const v = parseFloat(raw)
+        if (!isNaN(v)) onChange(v)
+      }}
+      onBlur={() => {
+        const v = parseFloat(str)
+        if (isNaN(v)) setStr(String(value))
+      }}
+    />
+  )
+}
 
 // ── Markdown textarea with keyboard shortcuts ─────────────────────────────
 function MdTextarea({ value, onChange, rows = 4, placeholder, hideTips = false }) {
@@ -201,14 +224,20 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
               <div className="empty" style={{ padding: '18px 0' }}>No key results defined yet.</div>
             )}
             {allKRs.map(kr => {
+              const type = kr.type || 'number'
               const val = krU[kr.id] !== undefined ? krU[kr.id] : kr.current
-              const pct = Math.round(Math.min(100, (val / Math.max(1, kr.target)) * 100))
-              const prevPct = Math.round(Math.min(100, (kr.current / Math.max(1, kr.target)) * 100))
+              const pct = type === 'binary'
+                ? (val >= 1 ? 100 : 0)
+                : Math.round(Math.min(100, (val / Math.max(1, kr.target)) * 100))
+              const prevPct = type === 'binary'
+                ? (kr.current >= 1 ? 100 : 0)
+                : Math.round(Math.min(100, (kr.current / Math.max(1, kr.target)) * 100))
               const deltaPct = pct - prevPct
               const chg = krU[kr.id] !== undefined && krU[kr.id] !== kr.current
+              const step = type === 'rating' ? 0.5 : type === 'percent' ? 1 : Number.isInteger(kr.target) ? 1 : 0.1
               const set = v => {
                 const next = Math.round(Math.max(0, Math.min(kr.target, v)) * 100) / 100
-                const nextPct = Math.round(Math.min(100, (next / Math.max(1, kr.target)) * 100))
+                const nextPct = type === 'binary' ? (next >= 1 ? 100 : 0) : Math.round(Math.min(100, (next / Math.max(1, kr.target)) * 100))
                 if (next === 0) firedRef.current.delete(kr.id)
                 if (nextPct === 100 && !firedRef.current.has(kr.id)) {
                   firedRef.current.add(kr.id)
@@ -225,32 +254,49 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
                       <div style={{ fontSize: 10, color: 'var(--text3)' }}>{kr.vecName}</div>
                     </div>
                     <div style={{ fontSize: 11, fontWeight: chg ? 600 : 400, color: 'var(--text)' }}>
-                      {chg ? `${kr.current} → ${val}` : `${val}`}
-                      {chg && deltaPct !== 0 && (
-                        <span style={{
-                          fontWeight: 400, marginLeft: 4,
-                          color: deltaPct > 0 ? '#16A34A' : '#DC2626'
-                        }}>{deltaPct > 0 ? `+${deltaPct}%` : `${deltaPct}%`}</span>
+                      {type === 'binary'
+                        ? (val >= 1 ? '✓ Done' : '○ Not done')
+                        : type === 'percent'
+                        ? (chg ? `${kr.current}% → ${val}%` : `${val}%`)
+                        : (chg ? `${kr.current} → ${val}` : `${val}`)
+                      }
+                      {chg && deltaPct !== 0 && type !== 'binary' && (
+                        <span style={{ fontWeight: 400, marginLeft: 4, color: deltaPct > 0 ? '#16A34A' : '#DC2626' }}>
+                          {deltaPct > 0 ? `+${deltaPct}%` : `${deltaPct}%`}
+                        </span>
                       )}
                     </div>
                   </div>
-                  <input
-                    type="range"
-                    min={0} max={kr.target} step={Number.isInteger(kr.target) ? 1 : 0.1}
-                    value={val}
-                    onChange={e => set(parseFloat(e.target.value))}
-                    style={{ width: '100%', marginTop: 8, accentColor: kr.domainColor }}
-                  />
-                  <div className="kr-stepper">
-                    <button className="kr-stepper-btn" onClick={() => set(val - 1)}>−</button>
-                    <input
-                      type="number"
-                      value={val}
-                      onChange={e => { const v = parseFloat(e.target.value); if (!isNaN(v)) set(v) }}
-                    />
-                    <button className="kr-stepper-btn" onClick={() => set(val + 1)}>+</button>
-                    <span style={{ fontSize: 11, color: 'var(--text3)', marginLeft: 2 }}>/ {kr.target}</span>
-                  </div>
+
+                  {type === 'binary' ? (
+                    <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
+                      {[{ l: 'Not done', color: '#F87171' }, { l: 'Done', color: '#16A34A' }].map(({ l, color }, i) => (
+                        <button key={l} onClick={() => set(i)} style={{
+                          flex: 1, padding: '7px', borderRadius: 'var(--r)', cursor: 'pointer',
+                          border: `1px solid ${val === i ? color : 'var(--border2)'}`,
+                          background: val === i ? color + '18' : 'var(--bg2)',
+                          color: val === i ? color : 'var(--text2)',
+                          fontSize: 13, fontWeight: val === i ? 600 : 400,
+                        }}>{l}</button>
+                      ))}
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        type="range" min={0} max={kr.target} step={step} value={val}
+                        onChange={e => set(parseFloat(e.target.value))}
+                        style={{ width: '100%', marginTop: 8, accentColor: kr.domainColor }}
+                      />
+                      <div className="kr-stepper">
+                        <button className="kr-stepper-btn" onClick={() => set(val - step)}>−</button>
+                        <NumericInput value={val} onChange={set} />
+                        <button className="kr-stepper-btn" onClick={() => set(val + step)}>+</button>
+                        <span style={{ fontSize: 11, color: 'var(--text3)', marginLeft: 2 }}>
+                          / {type === 'percent' ? '100%' : kr.target}
+                        </span>
+                      </div>
+                    </>
+                  )}
                 </div>
               )
             })}
