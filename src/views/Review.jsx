@@ -152,35 +152,44 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
             {allKRs.map(kr => {
               const val = krU[kr.id] !== undefined ? krU[kr.id] : kr.current
               const pct = Math.round(Math.min(100, (val / Math.max(1, kr.target)) * 100))
+              const prevPct = Math.round(Math.min(100, (kr.current / Math.max(1, kr.target)) * 100))
+              const deltaPct = pct - prevPct
               const chg = krU[kr.id] !== undefined && krU[kr.id] !== kr.current
+              const set = v => setKrU(u => ({ ...u, [kr.id]: Math.round(Math.max(0, Math.min(kr.target, v)) * 100) / 100 }))
               return (
-                <div key={kr.id} className="kr-update-row">
-                  <div style={{ width: 7, height: 7, borderRadius: '50%', background: kr.domainColor, flexShrink: 0 }} />
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13 }}>{kr.label}</div>
-                    <div style={{ fontSize: 10, color: 'var(--text3)' }}>{kr.vecName}</div>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <div style={{ width: 56, height: 3, background: 'var(--bg3)', borderRadius: 2 }}>
-                      <div style={{ width: pct + '%', height: '100%', background: kr.domainColor, borderRadius: 2 }} />
+                <div key={kr.id} className={`kr-update-row${chg ? ' changed' : ''}`}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: kr.domainColor, flexShrink: 0 }} />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontSize: 13, fontWeight: 500 }}>{kr.label}</div>
+                      <div style={{ fontSize: 10, color: 'var(--text3)' }}>{kr.vecName}</div>
                     </div>
-                    <span style={{ fontSize: 10, color: 'var(--text3)', minWidth: 28, textAlign: 'right' }}>{pct}%</span>
+                    <div style={{ fontSize: 11, fontWeight: chg ? 600 : 400, color: 'var(--text)' }}>
+                      {chg ? `${kr.current} → ${val}` : `${val}`}
+                      {chg && (
+                        <span style={{
+                          fontWeight: 400, marginLeft: 4,
+                          color: deltaPct > 0 ? '#16A34A' : '#DC2626'
+                        }}>{deltaPct > 0 ? `+${deltaPct}%` : `${deltaPct}%`}</span>
+                      )}
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                    <span style={{ fontSize: 11, color: 'var(--text3)' }}>{kr.current} →</span>
+                  <input
+                    type="range"
+                    min={0} max={kr.target} step={Number.isInteger(kr.target) ? 1 : 0.1}
+                    value={val}
+                    onChange={e => set(parseFloat(e.target.value))}
+                    style={{ width: '100%', marginTop: 8, accentColor: kr.domainColor }}
+                  />
+                  <div className="kr-stepper">
+                    <button className="kr-stepper-btn" onClick={() => set(val - 1)}>−</button>
                     <input
                       type="number"
                       value={val}
-                      onChange={e => setKrU(u => ({ ...u, [kr.id]: parseFloat(e.target.value) || 0 }))}
-                      style={{
-                        width: 68, padding: '5px 8px',
-                        background: 'var(--bg3)',
-                        border: `1px solid ${chg ? '#16A34A' : 'var(--border2)'}`,
-                        borderRadius: 'var(--r)', color: 'var(--text)',
-                        fontSize: 12, outline: 'none', textAlign: 'right',
-                      }}
+                      onChange={e => { const v = parseFloat(e.target.value); if (!isNaN(v)) set(v) }}
                     />
-                    <span style={{ fontSize: 10, color: 'var(--text3)' }}>/ {kr.target}</span>
+                    <button className="kr-stepper-btn" onClick={() => set(val + 1)}>+</button>
+                    <span style={{ fontSize: 11, color: 'var(--text3)', marginLeft: 2 }}>/ {kr.target}</span>
                   </div>
                 </div>
               )

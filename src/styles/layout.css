@@ -166,8 +166,18 @@
 .star { width: 36px; height: 36px; border-radius: 5px; border: 1px solid var(--border2); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; transition: all 0.1s; opacity: 0.35; }
 .star.on { border-color: var(--border2); background: var(--bg3); opacity: 1; }
 
-.kr-update-row { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+.kr-update-row { padding: 12px 0; border-bottom: 1px solid var(--border); }
 .kr-update-row:last-child { border-bottom: none; }
+.kr-update-row.changed { background: rgba(22,163,74,0.04); margin: 0 -16px; padding: 12px 16px; }
+.kr-stepper { display: flex; align-items: center; gap: 6px; margin-top: 10px; }
+.kr-stepper-btn { width: 28px; height: 28px; border-radius: var(--r); border: 1px solid var(--border2); background: var(--bg2); color: var(--text); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; transition: background 0.1s; }
+.kr-stepper-btn:hover { background: var(--bg3); }
+.kr-stepper input { width: 72px; padding: 5px 8px; background: var(--bg3); border: 1px solid var(--border2); border-radius: var(--r); color: var(--text); font-size: 13px; outline: none; text-align: center; -moz-appearance: textfield; }
+.kr-stepper input:focus { border-color: var(--accent); }
+.kr-stepper input::-webkit-outer-spin-button,
+.kr-stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.kr-full-bar { height: 5px; background: var(--bg3); border-radius: 3px; margin-top: 6px; overflow: hidden; }
+.kr-full-bar-fill { height: 100%; border-radius: 3px; transition: width 0.2s; }
 
 .prompts-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 11px; }
 .prompt-chip { padding: 4px 11px; border-radius: 100px; border: 1px solid var(--border2); background: none; color: var(--text2); font-size: 11px; cursor: pointer; transition: all 0.12s; }
