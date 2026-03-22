@@ -1,9 +1,44 @@
 import { useState, useRef } from 'react'
 import confetti from 'canvas-confetti'
+import { marked } from 'marked'
 import { isSunday, formatWeekRange, getWeekKey, todayString } from '../data/utils'
 import { ICEBREAKERS, FREE_PROMPTS, RATING_LABELS, RATING_COLORS, RATING_EMOJIS } from '../data/constants'
 import { loadReviews, saveReviews } from '../data/storage'
 import { uid } from '../data/utils'
+
+// ── Markdown textarea with keyboard shortcuts ─────────────────────────────
+function MdTextarea({ value, onChange, rows = 4, placeholder, hideTips = false }) {
+  function handleKeyDown(e) {
+    const el = e.target
+    const { selectionStart: s, selectionEnd: end } = el
+    const sel = value.slice(s, end)
+    const wrap = (marker) => {
+      e.preventDefault()
+      const newVal = value.slice(0, s) + marker + sel + marker + value.slice(end)
+      onChange(newVal)
+      setTimeout(() => {
+        el.selectionStart = s + marker.length
+        el.selectionEnd = end + marker.length
+      }, 0)
+    }
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') wrap('**')
+    if ((e.ctrlKey || e.metaKey) && e.key === 'i') wrap('*')
+    if ((e.ctrlKey || e.metaKey) && e.key === 'e') wrap('`')
+  }
+  return (
+    <div>
+      <textarea rows={rows} placeholder={placeholder} value={value} onChange={e => onChange(e.target.value)} onKeyDown={handleKeyDown} />
+      {!hideTips && (
+        <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 5, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <span><kbd>Ctrl+B</kbd> bold</span>
+          <span><kbd>Ctrl+I</kbd> italic</span>
+          <span><kbd>Ctrl+E</kbd> code</span>
+          <span style={{ color: '#16A34A' }}>markdown supported</span>
+        </div>
+      )}
+    </div>
+  )
+}
 
 // ── Review flow (4 steps) ────────────────────────────────────────────────
 function ReviewFlow({ onComplete, onCancel, domains }) {
@@ -12,6 +47,8 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
   const [ratings,  setRatings]  = useState({})
   const [krU,      setKrU]      = useState({})
   const [freeText, setFreeText] = useState('')
+  const [icePreview, setIcePreview] = useState(false)
+  const [preview,    setPreview]    = useState(false)
   const [done,     setDone]     = useState(false)
   const firedRef = useRef(new Set())
 
@@ -77,7 +114,13 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
       {step === 0 && (
         <div className="review-wrap">
           <div className="st" style={{ marginBottom: 5 }}>Step 1 of 4</div>
-          <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 4 }}>Check in</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>Check in</div>
+            <div style={{ display: 'flex', gap: 2, background: 'var(--bg3)', borderRadius: 'var(--r)', padding: 3 }}>
+              <button className={`btn${!icePreview ? ' pri' : ' ghost'}`} style={{ padding: '3px 10px', fontSize: 11 }} onClick={() => setIcePreview(false)}>Write</button>
+              <button className={`btn${icePreview ? ' pri' : ' ghost'}`} style={{ padding: '3px 10px', fontSize: 11 }} onClick={() => setIcePreview(true)}>Preview</button>
+            </div>
+          </div>
           <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 18, lineHeight: 1.55 }}>
             Three quick questions to orient yourself. No right answers.
           </div>
@@ -86,14 +129,20 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
               <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 8, lineHeight: 1.5 }}>
                 <strong>{i + 1}. </strong>{ib.q}
               </div>
-              <textarea
-                rows={3}
-                placeholder="..."
-                value={iceA[ib.id] || ''}
-                onChange={e => setIceA(a => ({ ...a, [ib.id]: e.target.value }))}
-              />
+              {icePreview
+                ? <div className="md-preview" dangerouslySetInnerHTML={{ __html: marked(iceA[ib.id] || '*Not answered yet.*') }} />
+                : <MdTextarea rows={3} placeholder="..." value={iceA[ib.id] || ''} onChange={v => setIceA(a => ({ ...a, [ib.id]: v }))} hideTips />
+              }
             </div>
           ))}
+          {!icePreview && (
+            <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 10, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <span><kbd>Ctrl+B</kbd> bold</span>
+              <span><kbd>Ctrl+I</kbd> italic</span>
+              <span><kbd>Ctrl+E</kbd> code</span>
+              <span style={{ color: '#16A34A' }}>markdown supported</span>
+            </div>
+          )}
         </div>
       )}
 
@@ -213,23 +262,39 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
       {step === 3 && (
         <div className="review-wrap">
           <div className="st" style={{ marginBottom: 5 }}>Step 4 of 4</div>
-          <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 4 }}>Free write</div>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em' }}>Free write</div>
+            <div style={{ display: 'flex', gap: 2, background: 'var(--bg3)', borderRadius: 'var(--r)', padding: 3 }}>
+              <button className={`btn${!preview ? ' pri' : ' ghost'}`} style={{ padding: '3px 10px', fontSize: 11 }} onClick={() => setPreview(false)}>Write</button>
+              <button className={`btn${preview ? ' pri' : ' ghost'}`} style={{ padding: '3px 10px', fontSize: 11 }} onClick={() => setPreview(true)}>Preview</button>
+            </div>
+          </div>
           <div style={{ fontSize: 13, color: 'var(--text2)', marginBottom: 18, lineHeight: 1.55 }}>
             Open space. Use the prompts as nudges or ignore them entirely.
           </div>
-          <div className="prompts-row">
-            {FREE_PROMPTS.map(p => (
-              <button key={p} className="prompt-chip" onClick={() => setFreeText(t => (t ? t + '\n\n' : '') + p + ': ')}>
-                + {p}
-              </button>
-            ))}
-          </div>
-          <textarea
-            rows={9}
-            placeholder="Write freely about this week..."
-            value={freeText}
-            onChange={e => setFreeText(e.target.value)}
-          />
+          {!preview && (
+            <>
+              <div className="prompts-row">
+                {FREE_PROMPTS.map(p => (
+                  <button key={p} className="prompt-chip" onClick={() => setFreeText(t => (t ? t + '\n\n' : '') + p + ': ')}>
+                    + {p}
+                  </button>
+                ))}
+              </div>
+              <MdTextarea
+                rows={9}
+                placeholder="Write freely about this week..."
+                value={freeText}
+                onChange={setFreeText}
+              />
+            </>
+          )}
+          {preview && (
+            <div
+              className="md-preview"
+              dangerouslySetInnerHTML={{ __html: marked(freeText || '*Nothing written yet.*') }}
+            />
+          )}
         </div>
       )}
 
@@ -263,7 +328,7 @@ function ReviewDetail({ review, domains, onClose }) {
             {ICEBREAKERS.map(ib => review.iceAnswers[ib.id] && (
               <div key={ib.id} style={{ marginBottom: 10 }}>
                 <div style={{ fontSize: 12, color: 'var(--text2)', marginBottom: 3 }}>{ib.q}</div>
-                <div style={{ fontSize: 13, lineHeight: 1.65, whiteSpace: 'pre-wrap' }}>{review.iceAnswers[ib.id]}</div>
+                <div className="md-preview" dangerouslySetInnerHTML={{ __html: marked(review.iceAnswers[ib.id]) }} />
               </div>
             ))}
           </div>
@@ -291,7 +356,7 @@ function ReviewDetail({ review, domains, onClose }) {
         {review.freeText && (
           <div style={{ marginBottom: 16 }}>
             <div className="st" style={{ marginBottom: 8 }}>Free write</div>
-            <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{review.freeText}</div>
+            <div className="md-preview" dangerouslySetInnerHTML={{ __html: marked(review.freeText) }} />
           </div>
         )}
 
