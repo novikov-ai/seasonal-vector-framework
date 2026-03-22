@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import confetti from 'canvas-confetti'
 import { isSunday, formatWeekRange, getWeekKey, todayString } from '../data/utils'
 import { ICEBREAKERS, FREE_PROMPTS, RATING_LABELS, RATING_COLORS, RATING_EMOJIS } from '../data/constants'
 import { loadReviews, saveReviews } from '../data/storage'
@@ -12,6 +13,7 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
   const [krU,      setKrU]      = useState({})
   const [freeText, setFreeText] = useState('')
   const [done,     setDone]     = useState(false)
+  const firedRef = useRef(new Set())
 
   const steps = ['Check in', 'Vectors', 'Metrics', 'Free write']
 
@@ -155,7 +157,16 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
               const prevPct = Math.round(Math.min(100, (kr.current / Math.max(1, kr.target)) * 100))
               const deltaPct = pct - prevPct
               const chg = krU[kr.id] !== undefined && krU[kr.id] !== kr.current
-              const set = v => setKrU(u => ({ ...u, [kr.id]: Math.round(Math.max(0, Math.min(kr.target, v)) * 100) / 100 }))
+              const set = v => {
+                const next = Math.round(Math.max(0, Math.min(kr.target, v)) * 100) / 100
+                const nextPct = Math.round(Math.min(100, (next / Math.max(1, kr.target)) * 100))
+                if (next === 0) firedRef.current.delete(kr.id)
+                if (nextPct === 100 && !firedRef.current.has(kr.id)) {
+                  firedRef.current.add(kr.id)
+                  confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } })
+                }
+                setKrU(u => ({ ...u, [kr.id]: next }))
+              }
               return (
                 <div key={kr.id} className={`kr-update-row${chg ? ' changed' : ''}`}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
