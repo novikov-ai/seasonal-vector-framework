@@ -4,10 +4,32 @@ const KEYS = {
   THEME: 'svf_theme',
 }
 
+const STATUS_MIGRATION = {
+  'active':   'on track',
+  'building': 'paused',
+  'planned':  'not started',
+}
+
+function migrateData(data) {
+  if (!data?.domains) return data
+  data.domains.forEach(domain => {
+    domain.vectors?.forEach(vec => {
+      if (STATUS_MIGRATION[vec.status]) {
+        vec.status = STATUS_MIGRATION[vec.status]
+      }
+    })
+  })
+  return data
+}
+
 export function loadData() {
   try {
     const raw = localStorage.getItem(KEYS.DATA)
-    return raw ? JSON.parse(raw) : null
+    if (!raw) return null
+    const data = JSON.parse(raw)
+    const migrated = migrateData(data)
+    saveData(migrated)
+    return migrated
   } catch (e) {
     return null
   }
