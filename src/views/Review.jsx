@@ -226,7 +226,7 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
                     </div>
                     <div style={{ fontSize: 11, fontWeight: chg ? 600 : 400, color: 'var(--text)' }}>
                       {chg ? `${kr.current} → ${val}` : `${val}`}
-                      {chg && (
+                      {chg && deltaPct !== 0 && (
                         <span style={{
                           fontWeight: 400, marginLeft: 4,
                           color: deltaPct > 0 ? '#16A34A' : '#DC2626'
