@@ -34,9 +34,10 @@ function VecRow({ vec, dom, onEditVec, onAddAction, onEditAction, onDelAction, o
 
         {open && (
           <div className="vec-expand">
+            <button onClick={() => setOpen(false)} style={{ fontSize: 11, color: 'var(--text3)', cursor: 'pointer', background: 'none', border: 'none', padding: 0, marginBottom: 8 }}>↑ collapse</button>
             {/* Key results section */}
             <div style={{ marginBottom: 10 }}>
-              <div className="vec-expand-title">Key results</div>
+              <div className="vec-expand-title krs">Key results</div>
               {(vec.krs || []).length === 0 && (
                 <div style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 4 }}>
                   No key results yet — add one to track progress.
@@ -52,12 +53,14 @@ function VecRow({ vec, dom, onEditVec, onAddAction, onEditAction, onDelAction, o
                   <button className="ib" style={{ width: 20, height: 20, fontSize: 10, color: '#DC2626' }} onClick={() => onDelKR(kr.id)}>✕</button>
                 </div>
               ))}
-              <button className="add-btn" onClick={onAddKR}>+ Key result</button>
+              <button className="add-btn-section krs" onClick={onAddKR}>
+                <span className="add-btn-plus">+</span>
+              </button>
             </div>
 
             {/* Actions section */}
             <div>
-              <div className="vec-expand-title">Actions</div>
+              <div className="vec-expand-title actions">Actions</div>
               {vec.actions.length === 0 && (
                 <div style={{ fontSize: 12, color: 'var(--text3)', marginBottom: 4 }}>
                   No actions yet — add what you'll do each quarter.
@@ -71,15 +74,23 @@ function VecRow({ vec, dom, onEditVec, onAddAction, onEditAction, onDelAction, o
                   <button className="ib" style={{ width: 20, height: 20, fontSize: 10, color: '#DC2626' }} onClick={() => onDelAction(a.id)}>✕</button>
                 </div>
               ))}
-              <button className="add-btn" onClick={onAddAction}>+ Action</button>
+              <button className="add-btn-section actions" onClick={onAddAction}>
+                <span className="add-btn-plus">+</span>
+              </button>
             </div>
           </div>
         )}
 
         {!open && (
           <div
-            style={{ fontSize: 11, color: 'var(--text3)', cursor: 'pointer', marginTop: 3 }}
             onClick={() => setOpen(true)}
+            style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              marginTop: 5, cursor: 'pointer',
+              fontSize: 11, color: '#CA8A04',
+              border: '1px solid rgba(202,138,4,0.35)',
+              borderRadius: 'var(--r)', padding: '2px 8px',
+            }}
           >
             {hint}
           </div>

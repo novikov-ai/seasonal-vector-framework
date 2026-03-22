@@ -113,7 +113,9 @@
 .vec-row { display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--border); }
 .vec-row:last-child { border-bottom: none; }
 .vec-expand { background: var(--bg3); border-radius: var(--r); padding: 12px 14px; margin-top: 7px; }
-.vec-expand-title { font-size: 9px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text3); margin-bottom: 6px; }
+.vec-expand-title { font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700; margin-bottom: 6px; }
+.vec-expand-title.krs   { color: #0891B2; }
+.vec-expand-title.actions { color: #DB2777; }
 
 /* ── Calendar ─────────────────────────────────────── */
 .q-strip { display: flex; gap: 5px; margin-bottom: 18px; flex-wrap: wrap; }

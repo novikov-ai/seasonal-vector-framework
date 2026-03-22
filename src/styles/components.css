@@ -24,17 +24,55 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 11px;
+  padding: 5px 12px;
   border-radius: var(--r);
-  border: 1px dashed var(--border2);
+  border: 1.5px dashed var(--border2);
   background: none;
-  color: var(--text3);
+  color: var(--text2);
   font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.12s;
   margin-top: 6px;
 }
-.add-btn:hover { color: var(--text); border-color: var(--text2); background: var(--bg4); }
+.add-btn:hover { color: var(--accent); border-color: var(--accent); background: rgba(22,163,74,0.06); }
+
+.add-btn-section {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 24px;
+  border-radius: 50px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s;
+  letter-spacing: 0.01em;
+}
+.add-btn-section.krs {
+  background: rgba(8,145,178,0.07);
+  border: 1px solid rgba(8,145,178,0.3);
+  color: #0891B2;
+}
+.add-btn-section.krs:hover {
+  background: rgba(8,145,178,0.14);
+  border-color: rgba(8,145,178,0.6);
+}
+.add-btn-section.actions {
+  background: rgba(219,39,119,0.07);
+  border: 1px solid rgba(219,39,119,0.3);
+  color: #DB2777;
+}
+.add-btn-section.actions:hover {
+  background: rgba(219,39,119,0.14);
+  border-color: rgba(219,39,119,0.6);
+}
+.add-btn-plus {
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+}
 
 /* ── Cards ────────────────────────────────────────── */
 .card {
