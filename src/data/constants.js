@@ -35,5 +35,6 @@ export const FREE_PROMPTS = [
   "What I need to let go of",
 ]
 
-export const RATING_LABELS = ['blocked', 'struggling', 'steady', 'good', 'excellent']
+export const RATING_LABELS  = ['blocked', 'struggling', 'steady', 'good', 'excellent']
+export const RATING_EMOJIS  = ['😔', '😟', '😐', '🙂', '😎']
 export const RATING_COLORS = ['#DC2626', '#CA8A04', '#0891B2', '#16A34A', '#7C3AED']

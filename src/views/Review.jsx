@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { isSunday, formatWeekRange, getWeekKey, todayString } from '../data/utils'
-import { ICEBREAKERS, FREE_PROMPTS, RATING_LABELS, RATING_COLORS } from '../data/constants'
+import { ICEBREAKERS, FREE_PROMPTS, RATING_LABELS, RATING_COLORS, RATING_EMOJIS } from '../data/constants'
 import { loadReviews, saveReviews } from '../data/storage'
 import { uid } from '../data/utils'
 
@@ -123,10 +123,11 @@ function ReviewFlow({ onComplete, onCancel, domains }) {
                   {[1, 2, 3, 4, 5].map(n => (
                     <div
                       key={n}
-                      className={`star ${(ratings[vec.id] || 0) >= n ? 'on' : ''}`}
+                      className={`star ${ratings[vec.id] === n ? 'on' : ''}`}
                       onClick={() => setRatings(r => ({ ...r, [vec.id]: n }))}
+                      style={ratings[vec.id] === n ? { borderColor: RATING_COLORS[n - 1], background: RATING_COLORS[n - 1] + '18' } : {}}
                     >
-                      {n}
+                      {RATING_EMOJIS[n - 1]}
                     </div>
                   ))}
                 </div>
