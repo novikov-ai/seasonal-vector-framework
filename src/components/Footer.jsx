@@ -9,7 +9,7 @@ export default function Footer() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Alexander Novikov
+          Alexander&nbsp;Novikov
         </a>
       </div>
     </footer>
