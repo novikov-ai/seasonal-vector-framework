@@ -11,6 +11,7 @@ export default function Calendar({ data, setData }) {
   const [selDay,  setSelDay]  = useState(null)
   const [editAnch, setEditAnch] = useState(null)
   const [editNote, setEditNote] = useState(null)
+  const [showPast, setShowPast] = useState(false)
 
   const q        = QUARTERS.find(x => x.id === activeQ)
   const year     = today.getFullYear()
@@ -54,9 +55,15 @@ export default function Calendar({ data, setData }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
         <div>
           <div style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>Calendar</div>
-          <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 3, letterSpacing: '0.06em' }}>
-            {data.anchors.length} anchors · {data.calNotes.length} notes
-          </div>
+          {(() => {
+            const upcoming = data.anchors.filter(a => daysUntil(a.date) >= 0).length
+            const past     = data.anchors.length - upcoming
+            return (
+              <div style={{ fontSize: 10, color: 'var(--text3)', marginTop: 3, letterSpacing: '0.06em' }}>
+                {upcoming} upcoming · {past} past · {data.calNotes.length} notes
+              </div>
+            )
+          })()}
         </div>
         <button className="btn" onClick={() => setEditAnch({ name: '', date: '', color: COLORS[0], isNew: true })}>
           + Anchor
@@ -149,27 +156,59 @@ export default function Calendar({ data, setData }) {
       )}
 
       {/* All anchors list */}
-      <div style={{ marginTop: 20 }}>
-        <div className="st" style={{ marginBottom: 10 }}>All anchors</div>
-        <div className="card" style={{ padding: '12px 16px' }}>
-          {data.anchors.length === 0 && (
-            <div className="empty" style={{ padding: '14px 0' }}>No anchors set yet.</div>
-          )}
-          {[...data.anchors].sort((a, b) => a.date.localeCompare(b.date)).map(a => {
-            const days = daysUntil(a.date)
-            return (
-              <div key={a.id} className="anchor-item" style={{ cursor: 'pointer' }} onClick={() => setEditAnch({ ...a })}>
-                <div style={{ width: 7, height: 7, borderRadius: '50%', background: a.color, flexShrink: 0 }} />
-                <div style={{ fontSize: 10, color: 'var(--text2)', minWidth: 78 }}>{formatDate(a.date)}</div>
-                <div style={{ flex: 1, fontSize: 13 }}>{a.name}</div>
-                <div style={{ fontSize: 11, fontWeight: 500, color: daysColor(days) }}>
-                  {days < 0 ? `${Math.abs(days)}d ago` : days === 0 ? 'Today' : `${days}d`}
-                </div>
+      {(() => {
+        const sorted = [...data.anchors].sort((a, b) => a.date.localeCompare(b.date))
+        const upcoming = sorted.filter(a => daysUntil(a.date) >= 0)
+        const past     = sorted.filter(a => daysUntil(a.date) < 0).reverse()
+
+        const renderAnchor = a => {
+          const days = daysUntil(a.date)
+          return (
+            <div key={a.id} className="anchor-item" style={{ cursor: 'pointer' }} onClick={() => setEditAnch({ ...a })}>
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: a.color, flexShrink: 0 }} />
+              <div style={{ fontSize: 10, color: 'var(--text2)', minWidth: 78 }}>{formatDate(a.date)}</div>
+              <div style={{ flex: 1, fontSize: 13 }}>{a.name}</div>
+              <div style={{ fontSize: 11, fontWeight: 500, color: daysColor(days) }}>
+                {days < 0 ? `${Math.abs(days)}d ago` : days === 0 ? 'Today' : `${days}d`}
               </div>
-            )
-          })}
-        </div>
-      </div>
+            </div>
+          )
+        }
+
+        return (
+          <div style={{ marginTop: 20 }}>
+            <div className="st" style={{ marginBottom: 10 }}>Upcoming anchors</div>
+            <div className="card" style={{ padding: '12px 16px' }}>
+              {upcoming.length === 0 && (
+                <div className="empty" style={{ padding: '14px 0' }}>No upcoming anchors.</div>
+              )}
+              {upcoming.map(renderAnchor)}
+            </div>
+
+            {past.length > 0 && (
+              <div style={{ marginTop: 12 }}>
+                <button
+                  onClick={() => setShowPast(v => !v)}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6,
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    padding: 0, marginBottom: 8,
+                  }}
+                >
+                  <span className="st" style={{ margin: 0 }}>Past anchors</span>
+                  <span style={{ fontSize: 10, color: 'var(--text3)' }}>{past.length}</span>
+                  <span style={{ fontSize: 10, color: 'var(--text3)' }}>{showPast ? '▲' : '▼'}</span>
+                </button>
+                {showPast && (
+                  <div className="card" style={{ padding: '12px 16px', opacity: 0.7 }}>
+                    {past.map(renderAnchor)}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )
+      })()}
 
       {editAnch && (
         <AnchorModal
