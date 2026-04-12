@@ -8,8 +8,8 @@ export default function Today({ data, onToggleAction }) {
   const qId     = getCurrentQuarter(today)
   const q       = QUARTERS.find(x => x.id === qId)
 
-  const [lastChecked, setLastChecked] = useState(null)
-  const undoRef = useRef(null)
+  const [fadingOut, setFadingOut] = useState({})
+  const timersRef = useRef({})
 
   // Gather all actions for this quarter across all vectors
   const allActions = []
@@ -26,8 +26,8 @@ export default function Today({ data, onToggleAction }) {
     )
   )
 
-  const pending  = allActions.filter(a => !data.checkedActions.includes(a.id))
-  const done     = allActions.filter(a =>  data.checkedActions.includes(a.id))
+  const visible  = allActions.filter(a => !data.checkedActions.includes(a.id) || fadingOut[a.id])
+  const done     = allActions.filter(a =>  data.checkedActions.includes(a.id) && !fadingOut[a.id])
   const upcoming = data.anchors
     .map(a => ({ ...a, days: daysUntil(a.date) }))
     .sort((a, b) => a.days - b.days)
@@ -41,18 +41,20 @@ export default function Today({ data, onToggleAction }) {
   const dateStr = today.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
 
   function handleCheck(action) {
-    setLastChecked(action)
     onToggleAction(action.id)
-    clearTimeout(undoRef.current)
-    undoRef.current = setTimeout(() => setLastChecked(null), 5000)
+    const tid = setTimeout(() => {
+      setFadingOut(prev => { const n = { ...prev }; delete n[action.id]; return n })
+      delete timersRef.current[action.id]
+    }, 5000)
+    timersRef.current[action.id] = tid
+    setFadingOut(prev => ({ ...prev, [action.id]: tid }))
   }
 
-  function handleUndo() {
-    if (lastChecked) {
-      onToggleAction(lastChecked.id)
-      setLastChecked(null)
-      clearTimeout(undoRef.current)
-    }
+  function handleUndo(action) {
+    clearTimeout(timersRef.current[action.id])
+    delete timersRef.current[action.id]
+    setFadingOut(prev => { const n = { ...prev }; delete n[action.id]; return n })
+    onToggleAction(action.id)
   }
 
   const daysColor = days =>
@@ -80,35 +82,34 @@ export default function Today({ data, onToggleAction }) {
         <div>
           <div className="st" style={{ marginBottom: 10 }}>Active actions · {qId}</div>
           <div className="card" style={{ padding: '12px 16px' }}>
-            {lastChecked && (
-              <div className="undo-row">
-                <span style={{ flex: 1 }}>
-                  Marked "{lastChecked.text.slice(0, 38)}{lastChecked.text.length > 38 ? '…' : ''}" done
-                </span>
-                <button className="btn soft" style={{ padding: '2px 10px', fontSize: 11 }} onClick={handleUndo}>
-                  Undo
-                </button>
-              </div>
-            )}
-            {pending.length === 0 && !lastChecked && (
+            {visible.length === 0 && (
               <div className="empty" style={{ padding: '18px 0' }}>All actions done. 🎯</div>
             )}
-            {pending.map(a => (
-              <div key={a.id} className="action-item">
-                <div
-                  className={`action-cb ${data.checkedActions.includes(a.id) ? 'checked' : ''}`}
-                  onClick={() => handleCheck(a)}
-                >
-                  {data.checkedActions.includes(a.id) ? '✓' : null}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: 13 }}>{a.text}</div>
-                  <div style={{ fontSize: 11, color: a.domainColor, marginTop: 1 }}>
-                    {a.domainName} · {a.vecName}
+            {visible.map(a => {
+              const isFading = !!fadingOut[a.id]
+              return (
+                <div key={a.id} className="action-item" style={isFading ? { opacity: 0.5 } : undefined}>
+                  <div className={`action-cb${isFading ? ' checked' : ''}`} onClick={isFading ? undefined : () => handleCheck(a)}>
+                    {isFading ? '✓' : null}
                   </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 13, textDecoration: isFading ? 'line-through' : undefined }}>{a.text}</div>
+                    <div style={{ fontSize: 11, color: a.domainColor, marginTop: 1 }}>
+                      {a.domainName} · {a.vecName}
+                    </div>
+                  </div>
+                  {isFading && (
+                    <button
+                      className="btn soft"
+                      style={{ padding: '2px 10px', fontSize: 11, flexShrink: 0 }}
+                      onClick={() => handleUndo(a)}
+                    >
+                      Undo
+                    </button>
+                  )}
                 </div>
-              </div>
-            ))}
+              )
+            })}
             {done.length > 0 && (
               <div style={{
                 fontSize: 10, color: 'var(--text3)',
