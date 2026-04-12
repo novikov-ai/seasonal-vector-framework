@@ -48,6 +48,14 @@ export default function Today({ data, onToggleAction }) {
 
   const totalCompleted = Object.values(completedByQ).reduce((s, arr) => s + arr.length, 0)
 
+  const currentQIdx = QUARTERS.findIndex(x => x.id === qId)
+  const pastQIds    = QUARTERS.slice(0, currentQIdx).map(x => x.id)
+  const overdue     = allActionsAllQ.filter(a =>
+    pastQIds.includes(a.quarter) &&
+    !data.checkedActions.includes(a.id) &&
+    !fadingOut[a.id]
+  )
+
   const visible  = allActions.filter(a => !data.checkedActions.includes(a.id) || fadingOut[a.id])
   const upcoming = data.anchors
     .map(a => ({ ...a, days: daysUntil(a.date) }))
@@ -132,6 +140,38 @@ export default function Today({ data, onToggleAction }) {
               )
             })}
           </div>
+
+          {overdue.length > 0 && (
+            <div style={{ marginTop: 12 }}>
+              <div className="st" style={{ marginBottom: 8, color: '#DC2626' }}>
+                Overdue · {overdue.length}
+              </div>
+              <div className="card" style={{ padding: '12px 16px', borderColor: '#DC262620' }}>
+                {overdue.map(a => {
+                  const isFading = !!fadingOut[a.id]
+                  return (
+                    <div key={a.id} className="action-item" style={isFading ? { opacity: 0.5 } : undefined}>
+                      <div className={`action-cb${isFading ? ' checked' : ''}`} onClick={isFading ? undefined : () => handleCheck(a)}>
+                        {isFading ? '✓' : null}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 13, textDecoration: isFading ? 'line-through' : undefined }}>{a.text}</div>
+                        <div style={{ fontSize: 11, color: a.domainColor, marginTop: 1 }}>
+                          {a.domainName} · {a.vecName}
+                          <span style={{ color: 'var(--text3)' }}> · {a.quarter}</span>
+                        </div>
+                      </div>
+                      {isFading && (
+                        <button className="btn soft" style={{ padding: '2px 10px', fontSize: 11, flexShrink: 0 }} onClick={() => handleUndo(a)}>
+                          Undo
+                        </button>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {totalCompleted > 0 && (
             <div style={{ marginTop: 12 }}>
