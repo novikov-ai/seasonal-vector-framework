@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { getCurrentQuarter, daysUntil, formatDate, todayString } from '../data/utils'
 import { QUARTERS } from '../data/constants'
+import ActionItem from '../components/ActionItem'
 
 export default function Today({ data, onToggleAction }) {
   const today   = new Date()
@@ -12,22 +13,7 @@ export default function Today({ data, onToggleAction }) {
   const timersRef = useRef({})
   const [openQ, setOpenQ] = useState({})
 
-  // Gather all actions for this quarter across all vectors
-  const allActions = []
-  data.domains.forEach(dom =>
-    dom.vectors.forEach(vec =>
-      vec.actions
-        .filter(a => a.quarter === qId || !a.quarter)
-        .forEach(a => allActions.push({
-          ...a,
-          domainName:  dom.name,
-          domainColor: dom.color,
-          vecName:     vec.name,
-        }))
-    )
-  )
-
-  // All actions across all quarters (for completed view)
+  // All actions across all quarters
   const allActionsAllQ = []
   data.domains.forEach(dom =>
     dom.vectors.forEach(vec =>
@@ -40,23 +26,25 @@ export default function Today({ data, onToggleAction }) {
     )
   )
 
+  const currentQIdx = QUARTERS.findIndex(x => x.id === qId)
+  const pastQIds    = QUARTERS.slice(0, currentQIdx).map(x => x.id)
+
+  const isChecked = id => data.checkedActions.includes(id)
+  const visible = allActionsAllQ.filter(a =>
+    (a.quarter === qId || !a.quarter) && (!isChecked(a.id) || fadingOut[a.id])
+  )
+
+  const overdue = allActionsAllQ.filter(a =>
+    pastQIds.includes(a.quarter) && (!isChecked(a.id) || fadingOut[a.id])
+  )
+
   const completedByQ = {}
   QUARTERS.forEach(q => { completedByQ[q.id] = [] })
   allActionsAllQ
-    .filter(a => data.checkedActions.includes(a.id) && !fadingOut[a.id])
+    .filter(a => isChecked(a.id) && !fadingOut[a.id])
     .forEach(a => { const k = a.quarter || qId; if (completedByQ[k]) completedByQ[k].push(a) })
-
   const totalCompleted = Object.values(completedByQ).reduce((s, arr) => s + arr.length, 0)
 
-  const currentQIdx = QUARTERS.findIndex(x => x.id === qId)
-  const pastQIds    = QUARTERS.slice(0, currentQIdx).map(x => x.id)
-  const overdue     = allActionsAllQ.filter(a =>
-    pastQIds.includes(a.quarter) &&
-    !data.checkedActions.includes(a.id) &&
-    !fadingOut[a.id]
-  )
-
-  const visible  = allActions.filter(a => !data.checkedActions.includes(a.id) || fadingOut[a.id])
   const upcoming = data.anchors
     .map(a => ({ ...a, days: daysUntil(a.date) }))
     .sort((a, b) => a.days - b.days)
@@ -114,31 +102,15 @@ export default function Today({ data, onToggleAction }) {
             {visible.length === 0 && (
               <div className="empty" style={{ padding: '18px 0' }}>All actions done. 🎯</div>
             )}
-            {visible.map(a => {
-              const isFading = !!fadingOut[a.id]
-              return (
-                <div key={a.id} className="action-item" style={isFading ? { opacity: 0.5 } : undefined}>
-                  <div className={`action-cb${isFading ? ' checked' : ''}`} onClick={isFading ? undefined : () => handleCheck(a)}>
-                    {isFading ? '✓' : null}
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 13, textDecoration: isFading ? 'line-through' : undefined }}>{a.text}</div>
-                    <div style={{ fontSize: 11, color: a.domainColor, marginTop: 1 }}>
-                      {a.domainName} · {a.vecName}
-                    </div>
-                  </div>
-                  {isFading && (
-                    <button
-                      className="btn soft"
-                      style={{ padding: '2px 10px', fontSize: 11, flexShrink: 0 }}
-                      onClick={() => handleUndo(a)}
-                    >
-                      Undo
-                    </button>
-                  )}
-                </div>
-              )
-            })}
+            {visible.map(a => (
+              <ActionItem
+                key={a.id}
+                action={a}
+                isFading={!!fadingOut[a.id]}
+                onCheck={handleCheck}
+                onUndo={handleUndo}
+              />
+            ))}
           </div>
 
           {overdue.length > 0 && (
@@ -147,28 +119,16 @@ export default function Today({ data, onToggleAction }) {
                 Overdue · {overdue.length}
               </div>
               <div className="card" style={{ padding: '12px 16px', borderColor: '#DC262620' }}>
-                {overdue.map(a => {
-                  const isFading = !!fadingOut[a.id]
-                  return (
-                    <div key={a.id} className="action-item" style={isFading ? { opacity: 0.5 } : undefined}>
-                      <div className={`action-cb${isFading ? ' checked' : ''}`} onClick={isFading ? undefined : () => handleCheck(a)}>
-                        {isFading ? '✓' : null}
-                      </div>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: 13, textDecoration: isFading ? 'line-through' : undefined }}>{a.text}</div>
-                        <div style={{ fontSize: 11, color: a.domainColor, marginTop: 1 }}>
-                          {a.domainName} · {a.vecName}
-                          <span style={{ color: 'var(--text3)' }}> · {a.quarter}</span>
-                        </div>
-                      </div>
-                      {isFading && (
-                        <button className="btn soft" style={{ padding: '2px 10px', fontSize: 11, flexShrink: 0 }} onClick={() => handleUndo(a)}>
-                          Undo
-                        </button>
-                      )}
-                    </div>
-                  )
-                })}
+                {overdue.map(a => (
+                  <ActionItem
+                    key={a.id}
+                    action={a}
+                    isFading={!!fadingOut[a.id]}
+                    onCheck={handleCheck}
+                    onUndo={handleUndo}
+                    showQuarter
+                  />
+                ))}
               </div>
             </div>
           )}
@@ -193,17 +153,16 @@ export default function Today({ data, onToggleAction }) {
                       <span style={{ fontSize: 10, color: 'var(--text3)', marginLeft: 'auto' }}>{isOpen ? '▲' : '▼'}</span>
                     </button>
                     {isOpen && (
-                      <div className="card" style={{ padding: '8px 16px' }}>
+                      <div className="card" style={{ padding: '8px 16px', opacity: 0.6 }}>
                         {items.map(a => (
-                          <div key={a.id} className="action-item" style={{ opacity: 0.6 }}>
-                            <div className="action-cb checked" style={{ cursor: 'default' }}>✓</div>
-                            <div style={{ flex: 1 }}>
-                              <div style={{ fontSize: 13, textDecoration: 'line-through' }}>{a.text}</div>
-                              <div style={{ fontSize: 11, color: a.domainColor, marginTop: 1 }}>
-                                {a.domainName} · {a.vecName}
-                              </div>
-                            </div>
-                          </div>
+                          <ActionItem
+                            key={a.id}
+                            action={a}
+                            isFading={false}
+                            onCheck={() => {}}
+                            onUndo={() => {}}
+                            showQuarter={qx.id !== qId}
+                          />
                         ))}
                       </div>
                     )}
