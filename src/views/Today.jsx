@@ -10,6 +10,7 @@ export default function Today({ data, onToggleAction }) {
 
   const [fadingOut, setFadingOut] = useState({})
   const timersRef = useRef({})
+  const [openQ, setOpenQ] = useState({})
 
   // Gather all actions for this quarter across all vectors
   const allActions = []
@@ -26,8 +27,28 @@ export default function Today({ data, onToggleAction }) {
     )
   )
 
+  // All actions across all quarters (for completed view)
+  const allActionsAllQ = []
+  data.domains.forEach(dom =>
+    dom.vectors.forEach(vec =>
+      vec.actions.forEach(a => allActionsAllQ.push({
+        ...a,
+        domainName:  dom.name,
+        domainColor: dom.color,
+        vecName:     vec.name,
+      }))
+    )
+  )
+
+  const completedByQ = {}
+  QUARTERS.forEach(q => { completedByQ[q.id] = [] })
+  allActionsAllQ
+    .filter(a => data.checkedActions.includes(a.id) && !fadingOut[a.id])
+    .forEach(a => { const k = a.quarter || qId; if (completedByQ[k]) completedByQ[k].push(a) })
+
+  const totalCompleted = Object.values(completedByQ).reduce((s, arr) => s + arr.length, 0)
+
   const visible  = allActions.filter(a => !data.checkedActions.includes(a.id) || fadingOut[a.id])
-  const done     = allActions.filter(a =>  data.checkedActions.includes(a.id) && !fadingOut[a.id])
   const upcoming = data.anchors
     .map(a => ({ ...a, days: daysUntil(a.date) }))
     .sort((a, b) => a.days - b.days)
@@ -110,16 +131,47 @@ export default function Today({ data, onToggleAction }) {
                 </div>
               )
             })}
-            {done.length > 0 && (
-              <div style={{
-                fontSize: 10, color: 'var(--text3)',
-                marginTop: 8, paddingTop: 8,
-                borderTop: '1px solid var(--border)',
-              }}>
-                {done.length} completed this quarter
-              </div>
-            )}
           </div>
+
+          {totalCompleted > 0 && (
+            <div style={{ marginTop: 12 }}>
+              {QUARTERS.map(qx => {
+                const items = completedByQ[qx.id]
+                if (items.length === 0) return null
+                const isOpen = !!openQ[qx.id]
+                return (
+                  <div key={qx.id} style={{ marginBottom: 4 }}>
+                    <button
+                      onClick={() => setOpenQ(prev => ({ ...prev, [qx.id]: !prev[qx.id] }))}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: 6, width: '100%',
+                        background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0',
+                      }}
+                    >
+                      <span className="st" style={{ margin: 0 }}>{qx.id} · {qx.name}</span>
+                      <span style={{ fontSize: 10, color: 'var(--text3)' }}>{items.length} done</span>
+                      <span style={{ fontSize: 10, color: 'var(--text3)', marginLeft: 'auto' }}>{isOpen ? '▲' : '▼'}</span>
+                    </button>
+                    {isOpen && (
+                      <div className="card" style={{ padding: '8px 16px' }}>
+                        {items.map(a => (
+                          <div key={a.id} className="action-item" style={{ opacity: 0.6 }}>
+                            <div className="action-cb checked" style={{ cursor: 'default' }}>✓</div>
+                            <div style={{ flex: 1 }}>
+                              <div style={{ fontSize: 13, textDecoration: 'line-through' }}>{a.text}</div>
+                              <div style={{ fontSize: 11, color: a.domainColor, marginTop: 1 }}>
+                                {a.domainName} · {a.vecName}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          )}
         </div>
 
         {/* Anchors column */}
