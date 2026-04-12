@@ -118,18 +118,29 @@ export default function Today({ data, onToggleAction }) {
               <div className="st" style={{ marginBottom: 8, color: '#DC2626' }}>
                 Overdue · {overdue.length}
               </div>
-              <div className="card" style={{ padding: '12px 16px', borderColor: '#DC262620' }}>
-                {overdue.map(a => (
-                  <ActionItem
-                    key={a.id}
-                    action={a}
-                    isFading={!!fadingOut[a.id]}
-                    onCheck={handleCheck}
-                    onUndo={handleUndo}
-                    showQuarter
-                  />
-                ))}
-              </div>
+              {pastQIds.map(qxId => {
+                const items = overdue.filter(a => a.quarter === qxId)
+                if (items.length === 0) return null
+                const qx = QUARTERS.find(x => x.id === qxId)
+                return (
+                  <div key={qxId} style={{ marginBottom: 8 }}>
+                    <div style={{ fontSize: 10, color: 'var(--text3)', marginBottom: 4, letterSpacing: '0.06em' }}>
+                      {qx.id} · {qx.name}
+                    </div>
+                    <div className="card" style={{ padding: '12px 16px', borderColor: '#DC262620' }}>
+                      {items.map(a => (
+                        <ActionItem
+                          key={a.id}
+                          action={a}
+                          isFading={!!fadingOut[a.id]}
+                          onCheck={handleCheck}
+                          onUndo={handleUndo}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )
+              })}
             </div>
           )}
 
