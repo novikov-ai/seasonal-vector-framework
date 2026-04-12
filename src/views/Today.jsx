@@ -97,7 +97,7 @@ export default function Today({ data, onToggleAction }) {
       <div className="today-grid">
         {/* Actions column */}
         <div>
-          <div className="st" style={{ marginBottom: 10 }}>Active actions · {qId}</div>
+          <div className="st" style={{ marginBottom: 10, color: '#16A34A' }}>Active actions · {qId}</div>
           <div className="card" style={{ padding: '12px 16px' }}>
             {visible.length === 0 && (
               <div className="empty" style={{ padding: '18px 0' }}>All actions done. 🎯</div>
@@ -175,7 +175,7 @@ export default function Today({ data, onToggleAction }) {
 
         {/* Anchors column */}
         <div>
-          <div className="st" style={{ marginBottom: 10 }}>Upcoming anchors</div>
+          <div className="st" style={{ marginBottom: 10, color: '#CA8A04' }}>Upcoming anchors</div>
           <div className="card" style={{ padding: '12px 16px' }}>
             {upcoming.length === 0 && (
               <div className="empty" style={{ padding: '18px 0' }}>No anchors set.</div>
