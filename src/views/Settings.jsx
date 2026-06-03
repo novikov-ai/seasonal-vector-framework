@@ -1,10 +1,12 @@
 import { useState } from 'react'
+import { loadReviews, saveReviews } from '../data/storage'
 
 export default function Settings({ data, setData, theme, setTheme, onReset }) {
   const [confirmReset, setConfirmReset] = useState(false)
 
   function exportData() {
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' })
+    const backup = { data, reviews: loadReviews() }
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
     const url  = URL.createObjectURL(blob)
     const a    = document.createElement('a')
     a.href     = url
@@ -19,7 +21,14 @@ export default function Settings({ data, setData, theme, setTheme, onReset }) {
     const reader = new FileReader()
     reader.onload = ev => {
       try {
-        setData(JSON.parse(ev.target.result))
+        const parsed = JSON.parse(ev.target.result)
+        // Support both new format { data, reviews } and legacy format (data only)
+        if (parsed.data && parsed.reviews !== undefined) {
+          setData(parsed.data)
+          saveReviews(parsed.reviews)
+        } else {
+          setData(parsed)
+        }
       } catch {
         alert('Invalid JSON file')
       }
