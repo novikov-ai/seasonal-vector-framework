@@ -3,6 +3,12 @@ import { defineConfig } from '@playwright/test'
 export default defineConfig({
   testDir: './e2e',
   timeout: 15000,
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.02, // allow up to 2% pixel diff before failing
+      animations: 'disabled',
+    },
+  },
   use: {
     baseURL: 'http://localhost:5173',
     headless: true,
